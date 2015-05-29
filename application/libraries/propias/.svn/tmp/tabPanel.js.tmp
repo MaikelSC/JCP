@@ -1,0 +1,132 @@
+$.JCP.tabPanel = {
+    objTemp : null,
+	crear: function TabPanel(arregloParametros){
+	$.extend(this, $.JCP.tabPanel.opcionesDefecto, arregloParametros);
+	TabPanel.prototype.construirTabPanel = function(){
+		this.contenedor = $('<div id = "'+this.id+'"></div>').appendTo(this.padre)
+		  .css({
+			 width: this.ancho,
+			 height: this.alto,
+			 backgroundColor:'#e9efee',
+			 border:'1px solid green',
+		  });
+		if(this.titulo != undefined){
+		    $('<div id = "titulo"></div>').appendTo(this.contenedor)
+			 .text(this.titulo)
+			 .css({
+			    border:'1px solid red',
+				backgroundColor:'#a6caf0'
+			 });
+		}
+		this.contPestannas = $('<div id = "contPest"></div>').appendTo(this.contenedor)
+								.css({
+									//border:'1px solid blue',
+								 });
+		$('<div id = "separador"></div>').appendTo(this.contenedor)
+		 .css({
+		  border: '1px solid black',
+		  marginTop:'1px',
+		  height:5
+		  });
+		  if(this.hijos.length > 0){
+			  this.crearPestannas();	
+			  this.contPestannas.css({
+			     height:this.contPestannas.children().height()
+			 });
+		}
+		/*$('<div id = "contTab"></div>').appendTo(this.contenedor)
+		 .css({
+		  border: '1px solid red',
+		  height:200
+		  });*/
+		 
+	}
+	TabPanel.prototype.crearPestannas = function(){
+	    var obj = this;
+		for(var i = 0; i < this.hijos.length; i++){
+		   var tab = $('<div id = "'+(i + 1)+'"></div>')
+			 .text(this.hijos[i].titulo)
+			 .appendTo(this.contPestannas)
+			 .css({
+			   width : this.hijos[i].ancho,
+			   height : this.hijos[i].alto,
+			   margin: '0.5px',
+			   //cursor:'pointer',
+			   float : 'left',			   
+			   border : '1px solid black',
+			   borderRadius : '4px 4px 0 0'
+			 });
+			if(this.hijos[i].cerrable){
+				this.btnCerrarTab(i, tab);
+			}
+			this.cargarPaneles(tab);
+			if(this.hijos[i].activo){
+			    tab.ready(function(){
+					 obj.activarPestanna($('#panel_'+tab.attr('id')));
+				});
+			}
+			tab.click(function(e){
+			e.stopPropagation();
+					if($('#panel_'+$(this).attr('id')).attr('id') != obj.panelAnterior.attr('id'))
+					 obj.activarPestanna($('#panel_'+$(this).attr('id')));
+			});
+		}
+	}
+	TabPanel.prototype.cargarPaneles = function(tab){
+<<<<<<< .mine
+	 	$('<div id = "panel_'+tab.attr('id')+'">'+tab.attr('id')+'</div>').appendTo(this.contenedor)
+=======
+	    //alert(tab.attr('id'));
+	 	$('<div id = "panel_'+tab.attr('id')+'">'+tab.attr('id')+'</div>').appendTo(this.contenedor)
+>>>>>>> .r219
+	  	 .css({
+	     	border: '1px solid green',
+	     	height:200,	
+			backgroundColor:'#dbe0e8'
+	  	  })
+		 .hide();		
+	}
+	TabPanel.prototype.activarPestanna = function(panel){alert(panel.attr('id'));
+	    if(this.panelAnterior != undefined){
+			this.panelAnterior.hide();
+	    }
+		this.panelAnterior = panel;
+		panel.show();
+	}
+	TabPanel.prototype.btnCerrarTab = function(i, tab){
+		var obj = this;
+		var contCerrar = $('<div id = "cerrar_'+(i + 1)+'"></div>')
+				 .appendTo(tab)
+				 .css({
+				 	 //border: '1px solid red',
+					 cursor:'pointer',
+					 float:'right',
+					 margin:'3px',
+					 width:10,
+					 height:10,
+					 backgroundImage:'url("/cantante/application/libraries/Propias/imagenes/cross_tab.gif")'
+				  })
+				 .click(function(e){
+				 	//alert('aa');
+					e.stopPropagation();
+					if($('#panel_'+tab.attr('id')).attr('id') == obj.panelAnterior.attr('id')){
+						if( tab.attr('id') == 1){
+						alert(parseInt(tab.attr('id')) + 1);
+							obj.activarPestanna($('#panel_'+(parseInt(tab.attr('id')) + 1)));
+						}
+						else
+						    obj.activarPestanna($('#panel_'+(tab.attr('id') - 1)));
+					}					
+					$('#panel_'+tab.attr('id')).remove();
+					tab.hide(100);
+					tab.remove();
+				 });  
+	}
+	this.construirTabPanel();
+	},
+	opcionesDefecto:{
+	 alto:400,
+	 ancho:450,
+	 
+	}
+	}

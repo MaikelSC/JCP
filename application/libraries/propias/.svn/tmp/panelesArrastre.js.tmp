@@ -1,0 +1,45 @@
+var arrDatosAux = Array("Perro","Gato","Raton","Chivo","Mono");
+
+$.JCP.panelesArrastre = {
+	crear: function PanelesArrastre(arregloParametros){
+	 this.padre = arregloParametros.padre;
+	 this.titulo = arregloParametros.titulo;
+	 this.id = arregloParametros.id;
+	 this.css = arregloParametros.css;
+     this.izq = arregloParametros.izq;
+     this.der = arregloParametros.der;
+	 this.url = arregloParametros.url;
+	 PanelesArrastre.prototype.construirPanel = function(){
+	 this.panel = $('<div id="'+this.id+'"></div>').appendTo(this.padre);
+     var titulo = $('<div id="titulo_'+this.id+'">'+this.titulo+'</div>').prependTo(this.panel);
+	 var tab_paneles = $('<table id="tab_'+this.id+'_paneles"></table>').appendTo(this.panel);
+	 var fila_paneles = $('<tr></tr>').appendTo(tab_paneles);
+	 var col_pan_izq = $('<td></td>').appendTo(fila_paneles); 
+	 var col_pan_btns = $('<td align ="center"></td>').appendTo(fila_paneles); 
+	 var col_pan_der = $('<td></td>').appendTo(fila_paneles); 
+	 var div_btns = $('<div id="div_'+this.id+'_btns"></div>').appendTo(col_pan_btns);
+	 var div_izq = $('<div id="div_'+this.id+'_izq"></div>').appendTo(col_pan_izq);
+	 var div_der = $('<div id="div_'+this.id+'_der"></div>').appendTo(col_pan_der);
+	 var panel_izq = $('<table id="pan_'+this.id+'_izq"></table>').appendTo(div_izq);
+	 $('<tr><td>'+this.izq.titulo+'</td></td>').appendTo(panel_izq);
+	 var panel_der = $('<table id="pan_'+this.id+'_der"></table>').appendTo(div_der);
+	 $('<tr><td>'+this.der.titulo+'</td></td>').appendTo(panel_der);
+	 var btn_der = $.Elementos.crearBoton("der"," >> ").appendTo(div_btns);
+	 var btn_der = $.Elementos.crearBoton("izq"," << ").appendTo(div_btns);
+	 this.panel.css({border:'1px solid black', height: 500, width : '50%'});
+	 tab_paneles.css({height: '100%', width : '100%'});
+	 titulo.css({border:'1px solid red'});
+	 div_btns.css({height: '99%', width : '25%'});
+	 div_izq.css({border:'1px solid green'});
+	 div_der.css({border:'1px solid green'});
+	 llenarPaneles(panel_izq);
+	 llenarPaneles(panel_der);
+	 }
+	 var llenarPaneles = function(panel){
+	 	for(var i = 0 ; i < arrDatosAux.length; i++ ){
+	 	 var fila = $('<tr id="'+i+'" ></tr>').appendTo(panel);
+		 var col = $('<td>'+arrDatosAux[i]+'</td>').appendTo(fila); 
+	 }
+	 }
+	}
+}

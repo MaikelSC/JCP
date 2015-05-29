@@ -1,0 +1,279 @@
+$.JCP.panelesArrastre = {
+    objTemp : null,
+	crear: function PanelesArrastre(arregloParametros){
+	$.extend(this, $.JCP.panelesArrastre.opcionesDefecto, arregloParametros);	 
+//-----------------------------------------construirPanel-----------------------------------------------------
+	 PanelesArrastre.prototype.construirPanel = function(){
+	 var obj = this;
+	 $.JCP.panelesArrastre.objTemp = null;
+	 this.panel = $('<div id="'+this.id+'"></div>').appendTo(this.padre);	 
+     var titulo = $('<div id="titulo_'+this.id+'">'+this.titulo+'</div>').prependTo(this.panel);
+	 if(this.add){
+	 	var fila_add = $('<div id="id_add"></div>').appendTo(this.panel); 
+		var text = $.Elementos.crearText(1, 'id_add_pan', 'add_pan').appendTo(fila_add).css({margin:5, width:this.izq.ancho*0.55});
+		var ejecfunc = function(){
+		                if(text.val() != ''){
+						var elemento = $('<div id="'+obj.div_izq.find('div').length+'" class = "elementos" >'+text.val()+'</div>').appendTo(obj.div_izq);
+						elemento.css({width:'55%', marginLeft:5});
+						$.JCP.arrastrarSoltar.objTemp.adicionarElemento(elemento);
+						}
+					 }
+		var boton = $.Elementos.crearBoton('id_btn_add', 'Adicionar', ejecfunc).appendTo(fila_add);
+	}
+	 var tab_paneles = $('<table id="tab_'+this.id+'_paneles"></table>').appendTo(this.panel);
+	 var fila_paneles = $('<tr></tr>').appendTo(tab_paneles);
+	 var col_pan_izq = $('<td></td>').appendTo(fila_paneles); 
+	 var col_pan_btns = $('<td align ="center"></td>').appendTo(fila_paneles); 
+	 var col_pan_der = $('<td align = "right"></td>').appendTo(fila_paneles); 
+	 var div_btns = $('<div id="div_'+this.id+'_btns"></div>').appendTo(col_pan_btns);
+	 var div_titulo_izq = $('<div id="Tit_div_'+this.id+'_izq">'+this.izq.titulo+'</div>').appendTo(col_pan_izq);
+	 div_titulo_izq.css({
+	        width: this.izq.ancho,
+	 });
+	 this.div_padre_izq = $('<div id="div_padre_'+this.id+'_izq"></div>').appendTo(col_pan_izq);
+	 this.div_padre_izq.css({
+		 	width: this.izq.ancho,
+			height:this.izq.alto
+		 });
+	 this.div_izq = $('<div id="div_'+this.id+'_izq"></div>')
+	 .appendTo(this.div_padre_izq)
+	 .css({
+//	 	margin:'1%'
+	 });
+	 
+	 $.consultaAjax.ejecutar({
+				url: this.izq.url,
+				persistir: obj,
+				async:false,
+				accionCorrecta: obj.llenarPanelIzq						
+				});
+	
+	 var div_titulo_der = $('<div id="div_'+this.id+'_der" align = "left">'+this.der.titulo+'</div>').appendTo(col_pan_der);
+	 div_titulo_der.css({
+	        width: this.der.ancho,
+			align:'left'
+	 });
+	 this.div_padre_der = $('<div id="div_padre_'+this.id+'_der" align = "left"></div>').appendTo(col_pan_der);
+	 this.div_padre_der.css({
+		 	width: this.der.ancho,
+			height:this.der.alto,
+//			backgroundColor:'red'
+		 });
+	 this.div_der = $('<div id="div_'+this.id+'_der" align = "left"></div>')
+	 .appendTo(this.div_padre_der)
+	 .css({
+	 	width:'98%',
+//	 	margin:this.der.ancho*98/100*1/100
+//		backgroundColor:'white'
+	 })
+	 
+	$.consultaAjax.ejecutar({
+				url: this.der.url,
+				async:false,
+				persistir: obj,
+				async:false,
+				accionCorrecta: obj.llenarPanelDer					
+				});
+	
+	 var func_btn_der = function(){
+	   obj.func_btns(obj.arrastrarSoltar, $.JCP.panelesArrastre.objTemp,  obj.div_izq, obj.div_der);
+	 }
+	 var func_btn_izq = function(){
+	   obj.func_btns($.JCP.panelesArrastre.objTemp, obj.arrastrarSoltar, obj.div_der, obj.div_izq);
+	 }
+	 var btn_der = $.Elementos.crearBoton("der"," >> ", func_btn_der).appendTo(div_btns);
+	 var btn_izq = $.Elementos.crearBoton("izq"," << ", func_btn_izq).appendTo(div_btns);
+	 this.panel.css({border:'1px solid black', height: '99%', width : '50%'});
+	 btn_der.css({marginBottom:10});
+	 tab_paneles.css({height: '100%', width : '100%'});
+	 titulo.css({border:'1px solid red'});
+	 div_btns.css({height: '99%', width : '25%'});
+//	 this.div_izq.css({border:'1px solid red'});
+//	 this.div_padre_izq.css({border:'1px solid green'});
+//	 this.div_der.css({border:'1px solid red'});
+//	 this.div_padre_der.css({border:'1px solid green'});
+	 if(this.salvar){
+		var fila_salvar = $('<div id="idsalvar" align = "right"></div>').appendTo(this.panel);
+		var ejecfunc = function(){
+		arr_izq = Array();
+		arr_der = Array();
+		obj.div_izq.children().each(function(){
+			arr_izq.push($(this).attr("id"));
+		});
+		obj.div_der.children().each(function(){
+		arr_der.push($(this).attr("id"));
+		});
+		var data = {};
+		data.ids_izq = arr_izq;
+		data.ids_der = arr_der;
+		$.consultaAjax.ejecutar({
+			data: data,
+			url: obj.url,
+			persistir: obj,
+			accionCorrecta: obj.guardado					
+			});
+		 
+		};
+		var boton = $.Elementos.crearBoton('id_btn_salvar', 'Guardar', ejecfunc).appendTo(fila_salvar)
+		.css({margin:5});
+		
+	}
+  }
+	//----------------------------------------------------------------------------------------------------
+  PanelesArrastre.prototype.func_btns = function(objNuevo, objViejo, div1, div2){
+        var obj = this;
+	 	var selecc = div1.find('.seleccionado');
+	 	var noSelecc = div1.find(':not(.seleccionado)');
+		if(selecc.length > 0){
+		if(this.desplazamiento == 'ninguno'|| this.desplazamiento == undefined){
+			selecc.each(function(){
+				obj.cambiarPadre(objNuevo, $(this), div2);
+			});
+		}
+		else{
+		    if(this.desplazamiento == 'sencillo'){
+				this.conDesplazamiento(objNuevo, objViejo, div2, selecc);
+			}
+			else if(this.desplazamiento == 'multiple'){
+				this.conDesplazamiento(objNuevo, objViejo, div2, selecc, true);			
+			}
+		}
+		objViejo.elemento = noSelecc;	
+		objViejo.seleccionar.elementos = noSelecc;
+		if(this.desplazamiento == 'ninguno'|| this.desplazamiento == undefined){			
+			objViejo.scroll.mostrarScroll();
+			objNuevo.scroll.mostrarScroll();
+		}
+	 }
+  }
+  PanelesArrastre.prototype.conDesplazamiento = function(objNuevo, objViejo, div2, selecc, multiple){
+  		var obj = this;
+	  	var top;
+		var left;
+		var incremento;
+		var countAnimate = 1;
+		var countSetTimeout = 1;		
+		if(div2.children().length > 0){
+			incremento = div2.find(':last-child').height();
+			top = div2.find(':last-child').offset().top;
+			left = div2.find(':last-child').offset().left;
+		}			
+		else{
+			top = div2.offset().top;
+			left = div2.offset().left;
+			incremento = selecc.height();
+		}		
+		selecc.each(function(){	
+			  
+			var elem = $(this);
+			setTimeout(function(){
+				var divselecc = $('<div id="div_seleccion"></div>')
+			  .appendTo('html');
+			  elem.clone().appendTo(divselecc).css({backgroundColor:''});	
+				divselecc.css({
+		            width: elem.width(),
+					height: elem.height(),
+					border: '1px solid #226175', 
+					position:'absolute',
+					top: elem.offset().top,
+					left: elem.offset().left,
+					zIndex: 2,
+					opacity: 0.5,
+					backgroundColor:'#c6e2ff',
+					boxShadow: '0 0 6px #000000',
+		   			borderRadius:'4px 4px 4px 4px',
+//					display:'none'
+				})
+				.css({
+//					display:'inherit'
+				})
+				.animate({
+				  top: top + incremento*countAnimate,
+				  left: left
+				},500,"linear",
+				function(){
+				  obj.cambiarPadre(objNuevo, elem, div2);
+				  divselecc.remove();
+//				  if(objNuevo.scroll != undefined)
+				  objNuevo.scroll.mostrarScroll();	
+//				  if(objViejo.scroll != undefined)
+				  objViejo.scroll.mostrarScroll();
+				});
+				countAnimate++;
+				}, 150*countSetTimeout);
+			if(!multiple)
+			 countSetTimeout++;			
+		});
+//		alert(objNuevo.scroll);
+//		alert(objViejo.scroll);
+		
+  }
+  PanelesArrastre.prototype.cambiarPadre = function(objNuevo, elemento, padreNuevo){
+	  elemento.css({backgroundColor:''});
+	  elemento.removeClass('seleccionado');
+	  elemento.addClass('seleccionable');
+	  var clon = elemento.clone();
+	  clon.appendTo(padreNuevo);
+	  clon.removeClass('shiftInicio');
+	  clon.removeClass('shiftFin');
+	  objNuevo.seleccionar.declararEventosElemento(clon);
+	  objNuevo.declarar(clon);
+	  objNuevo.elemento = $.merge(objNuevo.elemento, clon);			  
+	  elemento.remove();
+  }
+  PanelesArrastre.prototype.guardado = function(datos, obj){
+		 alert(obj.msgSalvar);
+  }
+  PanelesArrastre.prototype.llenarPanelIzq = function(datos, obj){
+		obj.llenarPaneles(obj.div_izq, datos);
+	}
+  PanelesArrastre.prototype.llenarPanelDer = function(datos, obj){
+		obj.llenarPaneles(obj.div_der, datos);
+	}
+//------------------------------------------------------------------------------------------------------------
+//--------------------llenarPaneles---------------------------------------------------------------------------
+	 PanelesArrastre.prototype.llenarPaneles = function(panel, arreglo){
+	 	for(var i = 0 ; i < arreglo.length; i++ ){
+		  var element =  $('<div id="'+arreglo[i].id+'" class = "elementos">'+arreglo[i].valor+'</div>').appendTo(panel);
+		  		element.css({
+					width:'55%',
+					marginLeft:5,
+//					backgroundColor:'yellow'
+				});		 
+	   }
+	   this.lanzarEventos(panel,panel.find('.elementos'));	 
+	 }
+//-------------------------------------------------------------------------------------------------------------
+    PanelesArrastre.prototype.lanzarEventos = function(padre, elementos){
+		$.JCP.Crear('arrastrarSoltar',{
+									elemento : elementos,
+									elementosSeleccionar: elementos,
+									padre: padre,
+									sincrono:true,
+									persistirObj : this
+   								   });
+		//alert(padre.parent().attr('id'));
+		$.JCP.Crear('scroll', {
+					elemento: padre.parent(),
+					sincrono: true,
+					persistirObj : this.arrastrarSoltar
+					});
+		if($.JCP.panelesArrastre.objTemp == null){
+			$.JCP.panelesArrastre.objTemp = this.arrastrarSoltar;
+			
+		}						   
+		
+	 }
+   this.construirPanel(); 
+   },
+	 opcionesDefecto:{
+	 	add:false,
+		div_izq:null,
+		div_padre_izq:null,
+		div_der:null,
+		div_padre_der:null,
+		salvar:true,
+		msgSalvar: "Datos guardados con exito"
+   }
+   
+}

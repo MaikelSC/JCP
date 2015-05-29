@@ -1,0 +1,108 @@
+$.Elementos = {
+    data : null ,
+	crearTablaFormulario:function(tablapadre, hijo, columnas){
+        var tablahijo = $('<table id="tb_'+hijo.id+'"/>');
+		if(hijo.fieldset)
+			var hijoformulario = $.Elementos.crearFieldSet(hijo.id, tablahijo, hijo.titulo, hijo.align);
+		else
+<<<<<<< .mine
+		this.hijoformulario = tablahijo;
+		if(tablapadre.children().find('>tr').length != 0 && tablapadre.children().find('>tr:last').children('td').length < columnas){
+			var col = $('<td></td>').appendTo(tablapadre.children().find('>tr:last'));
+		    this.hijoformulario.appendTo(col);
+=======
+			var hijoformulario = tablahijo;	
+		if(tablapadre.children().find('>tr').length != 0 && tablapadre.children().find('>tr:last').children('td').length < columnas){
+			var col = $('<td></td>').appendTo(tablapadre.children().find('>tr:last'));
+		    hijoformulario.appendTo(col);
+>>>>>>> .r32
+		}
+		else{
+			var fila = $('<tr></tr>').appendTo(tablapadre);
+			var col = $('<td></td>').appendTo(fila);
+		    hijoformulario.appendTo(col);
+		}
+		 return tablahijo;
+	},
+    crearFila : function(formulario, pos, columnas , tipos, names, ids){
+           if(formulario.find('tr').length > 0){
+		   	var fila = $('<tr></tr>').insertAfter(formulario.find('tr:eq('+pos+')'));
+		   }	      	 
+		   else{
+		   		var fila = $('<tr></tr>').appendTo(formulario);
+		   }
+		   for(var i =0; i< columnas; i++){	
+		   		var label = $('<td></td>').appendTo(fila);
+				var padreElemento = $('<td></td>').appendTo(fila);
+				if(names[i] != undefined){
+				   label.text(names[i]);
+				   var elemento = this.crearElemento(tipos[i], ids[i], names[i], padreElemento);
+				   if(elemento != undefined)
+				   elemento.appendTo(padreElemento);	
+				}				
+		   }			   
+	},
+    crearElemento : function(tipo, id, name, padreElemento){
+		if(tipo<2)
+			var elemento = this.crearText(tipo, id, name);
+		else if(tipo < 3)
+		    var elemento = this.crearSelect(tipo, id, name);
+		else if(tipo < 4)
+		    var elemento = this.crearBoton(tipo, id, name);
+		else if(tipo == 10)	{
+		    var elemento = $.JCP.Crear('cleditor',{
+			                              padre:padreElemento,
+										  tieneCss: true,
+	                                      jquery:true,
+										  id:id,
+										  name:name,
+		                                  width:300
+	                                      }
+	       );	
+//		   alert(elemento);
+		}   		
+		return elemento;	
+	},
+	crearText : function(tipo, id, name){
+		switch(tipo){
+			case 1: var textbox = $('<input id="'+id+'" name="'+name+'" type="text" class = "campos_texto"/>');
+			break;
+			case 1.1: var textbox = $('<input id="'+id+'" name="'+name+'" class = "campos_texto"/>');
+			break;
+			case 1.3:var textbox = $('<input id="'+id+'" name="'+name+'" type="text" class = "campos_texto"/>');
+			          textbox.datepicker({
+//							showOn: "button",
+//							buttonImage:  'application/libraries/propias/imagenes/calendario.gif',
+//							buttonImageOnly: true,
+							dateFormat: 'dd/m/yy',
+							/*onSelect: function() {
+							if(metodoSelect != undefined)
+							   metodoSelect(textbox);}*/
+					 }); 
+		}
+		if(this.data != undefined)
+			textbox.val(this.data[id]);
+		return textbox;
+	},
+	crearSelect : function(tipo, id, name){
+	    var select = $('<select id="'+id+'" name="'+name+'" class = "campos_texto"/>');
+		             $('<option value="-1">Seleccione</option>').appendTo(select);
+		if(this.data != undefined){
+		    $('<option value="'+this.data[id].id+'">'+this.data[id].valor+'</option>').appendTo(select);
+		}			 
+		return select;
+	},	
+	crearBoton : function(id, name){
+		var boton = $('<input type="button" class="boton" id="'+id+'" value="'+name+'" />');
+		return boton;
+	},
+	crearFieldSet : function(id, hijo, titulo, alinTitulo){
+	    //alert();
+		var field = $('<fieldset id = "fs_'+id+'"></fieldset>');
+		if(titulo != undefined)
+		var titulo = $('<legend id = "fs_'+id+'_titulo" align = "'+alinTitulo+'">'+titulo+'</legend>').appendTo(field);
+		hijo.appendTo(field);
+        return field;
+	}
+	
+}

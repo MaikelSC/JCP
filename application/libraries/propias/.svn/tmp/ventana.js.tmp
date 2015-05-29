@@ -1,0 +1,113 @@
+var contt = 0;
+$.JCP.ventana = {
+ crear: function Ventana(arregloParametros){
+  this.id = arregloParametros.id;
+  this.evento = arregloParametros.evento;
+  this.padre = arregloParametros.padre;
+  this.hijos = arregloParametros.hijos;
+  this.titulo = arregloParametros.titulo;
+  this.css = arregloParametros.css;
+
+  Ventana.prototype.mostrarVentana = function(){
+   this.contenedor = $('<div id="'+this.id+'">Cuerpo de la Ventana</div>').appendTo(this.padre);
+   var titulo = $('<div id="titulo_'+this.id+'">'+this.titulo+'</div>').prependTo(this.contenedor);
+   this.contenedor.appendTo(this.hijos);
+<<<<<<< .mine
+   this.padre.css({height:'200px', verticalAlign:'top'});
+=======
+   this.padre.css({height:'200px',verticalAlign:'top'});
+>>>>>>> .r38
+   this.contenedor.css({ border:'1px solid blue', width:'50px'});
+   titulo.css({border:'1px solid black'});
+   this.definirEvento();
+
+  }
+  Ventana.prototype.definirEvento = function(evento){
+   this.evento = evento!= undefined ? evento : this.evento;
+   var obj = this;
+   	   obj.XInicial = this.contenedor.offset().left - this.padre.offset().left;
+   	   obj.YInicial = this.contenedor.offset().top - this.padre.offset().top;
+   this.contenedor.bind(this.evento, function(e){
+       $.JCP.ventana.obj = obj;
+    obj.AccionEvento(e);
+    e.stopPropagation();
+   });
+//   alert(this.contenedor.mouseUp);
+   $('html').bind('mouseup', function(e){
+      obj.DesAccionEvento(e);
+   });
+//   alert(this.contenedor.mouseUp);
+
+  }
+  Ventana.prototype.DesAccionEvento = function(e){
+     var obj  = $.JCP.ventana.obj;
+     var cont =  $.JCP.ventana.obj.contenedor;
+     $('html').unbind('mousemove');
+//     $('html').unbind('mouseup');
+     $('#bloqueador').remove();
+//	 alert('df');
+     /*obj.X= null;
+	 obj.Y=null*/;
+  }
+
+  Ventana.prototype.AccionEvento = function(e){
+  var obj  = $.JCP.ventana.obj;
+  var cont =  $.JCP.ventana.obj.contenedor;
+  obj.X = e.pageX; 
+  obj.Y = e.pageY; 
+
+  cont.css({
+   position:'relative'
+   });
+   var x = cont.offset().left -  cont.parent().offset().left;
+   var y = cont.offset().top -  cont.parent().offset().top;
+   var bloqueador = $('<div id="bloqueador"></div>').prependTo($('html'));
+    bloqueador.css({
+     position:'absolute',
+     width:'100%',
+     height:'100%',
+//     backgroundColor:'green',
+     zIndex:'2'
+    });
+	/*alert(cont.offset().top);
+	alert(obj.Y);*/
+  $('html').bind('mousemove', function(e){
+           cont.css({
+             left:x + e.pageX - obj.X,
+             top:y + e.pageY - obj.Y,
+   			 zIndex:'3'
+           });
+          if(cont.offset().left <  cont.parent().offset().left){
+           cont.css({
+<<<<<<< .mine
+             left:-x
+=======
+             left: -obj.XInicial
+>>>>>>> .r38
+           })
+          }
+          else if(cont.offset().left+ cont.width()  > cont.parent().offset().left + cont.parent().width()){
+          cont.css({
+             left:cont.parent().width() - obj.XInicial - cont.width()
+           }) 
+          }
+<<<<<<< .mine
+		  if(cont.offset().top <=  cont.parent().offset().top){
+=======
+		  if(cont.offset().top <  cont.parent().offset().top){
+>>>>>>> .r38
+		  //alert(cont.parent().offset().top+' , '+cont.offset().top);
+		  	cont.css({
+             top: - obj.YInicial
+           })
+		   //alert(cont.offset().top);
+		  } 
+		  else if(cont.offset().top + cont.height()  > cont.parent().offset().top + cont.parent().height()){
+          cont.css({
+             top: cont.parent().height() - obj.YInicial - cont.height()
+           }) 
+          }        
+   });   
+  };
+ }
+}

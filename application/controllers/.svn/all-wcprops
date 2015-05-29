@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/cantante/!svn/ver/219/trunk/cantante/application/controllers
+END
+c_paneles_arrastre.php
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/cantante/!svn/ver/179/trunk/cantante/application/controllers/c_paneles_arrastre.php
+END
+c_entrada.php
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/cantante/!svn/ver/6/trunk/cantante/application/controllers/c_entrada.php
+END
+c_listado.php
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/cantante/!svn/ver/179/trunk/cantante/application/controllers/c_listado.php
+END
+c_administrador.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/cantante/!svn/ver/21/trunk/cantante/application/controllers/c_administrador.php
+END
+c_upload.php
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/cantante/!svn/ver/219/trunk/cantante/application/controllers/c_upload.php
+END
+c_autenticacion.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/cantante/!svn/ver/15/trunk/cantante/application/controllers/c_autenticacion.php
+END
+c_noticia.php
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/cantante/!svn/ver/172/trunk/cantante/application/controllers/c_noticia.php
+END

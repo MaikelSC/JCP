@@ -1,0 +1,344 @@
+$.JCP.upload = {
+    objTem: null,
+//	scroll:null,
+	crear : function Upload(arregloParametros){	
+	    $.extend(this, $.JCP.upload.opcionesDefecto, arregloParametros);
+//		 alert(this.altoImag);
+		Upload.prototype.construirUpload = function(){
+		    if($('#'+this.id).attr("id") == undefined){
+				var contenedor = $('<div class="contUpload" id="'+this.id+'">').appendTo(this.padre);
+			    contenedor.css({
+					/*height:500,
+					width:400,*/
+					/*border:'6px solid #e5e5e5',*/
+					/*paddingTop:0,*/
+//					backgroundColor: 'black',
+					borderRadius: '5px',
+				});
+				if(this.css != undefined)
+					contenedor.css(this.css);
+				this.contenedor = contenedor;
+			if(this.titulo != undefined){
+				var titulo = $('<div clas="titulo">'+this.titulo+'</div>').appendTo(contenedor);
+					titulo.css({
+						width:'100%',
+						height:'7%',
+						backgroundColor:'red',
+						textAlign:'center',
+						height:'7%'
+					});
+			}			
+			var iframe = $('<iframe name="iframe" width="600" height="400" >Texto alternativo para navegadores que no aceptan iframes</iframe>').appendTo($('body'));
+				iframe.css({
+					 display:'none'
+				});
+				
+//			var progreso =  $('<iframe id="progress_iframe" src=""  scrolling="no" frameborder="0"></iframe>').appendTo(this.contenedor);
+			   /*progreso.css({
+			       float:'right',
+				   height:2000,
+				   border:'2px solid red',
+				   position:'relative',
+				   top:50
+			   });*/
+							
+			var formulario = $('<form enctype="multipart/form-data"  method="POST" action="'+this.urls.adicionar+'" target="iframe"/>').appendTo(contenedor);
+				formulario.css({
+					width:'40%',
+					height:'10%',
+					padding:10,
+					paddingLeft:0
+				});
+//				$.centrar(formulario, true, false);
+			   formulario.centrar(true, false);
+			var boton = $('<input name="oculto" id="oculto" type="file"/>').appendTo(formulario);
+				boton.css({
+					display:'none'
+				});
+				var obj = this;
+		        boton.change(function(){
+//				alert(obj.cantidadXfila);
+				    $.JCP.upload.objTemp = obj;
+					formulario.submit();
+//					obj.rastrear();
+					
+//					setTimeout(boton.change());
+				});
+			var subir = $('<input type="button" value="Subir Foto"/>').appendTo(formulario);
+				subir.css({
+					height:40,
+					width:'100%',
+					color:'#3366CC',
+					fontWeight:'bold',
+					font:'bold 12px Arial,Helvetica,sans-serif',
+					backgroundColor:'#F2F2F2',
+					border:'1px solid #CCCCCC',
+					borderRadius: '5px 5px 5px 5px'
+				});
+				subir.hover(function(){$(this).css({cursor:'pointer'});},function(){$(this).css({cursor:'none'})});
+				subir.click(function(){boton.click()});
+			var contenedorImagenes = $('<div class="contImgsUpload"></div>').appendTo(contenedor);
+				contenedorImagenes.css({					
+//					padding:10,
+					/*position:'relative',*/
+					height:'77%'
+				});
+				
+				var contenedorImagenesFinal = $('<table><tr><td class="finalImagenes"></td></tr></table>').appendTo(contenedorImagenes);
+					contenedorImagenesFinal.css({
+//						
+						width:contenedorImagenes.width()-20,
+//                        margin:10,
+						backgroundColor:'brown'
+					});
+//						alert(this.anchoImag);
+						var cantidad = 	contenedorImagenesFinal.width()/(this.anchoImag +10);
+						this.cantidadXFila = parseInt(cantidad);
+//						alert(this.cantidadXFila);
+//						alert(contenedorImagenesFinal.width());
+//alert(this.cantidadXFila);
+alert(this.cantidadXFila*(this.anchoImag+10));
+					contenedorImagenesFinal.width(this.cantidadXFila*(this.anchoImag+10));
+				contenedorImagenesFinal.centrar(true, false);	
+				this.contenedorImagenes = contenedorImagenes;
+				this.contImagenesFinal = contenedorImagenesFinal;
+			}
+			else{
+				this.contenedor = $('#'+this.id);
+				this.contenedorImagenes = this.contenedor.find('.contImgsUpload');
+				this.contImagenesFinal = this.contenedor.find('.finalImagenes');
+			}
+		
+			this.Esperar();	
+			this.pedirImagenes();
+		}
+		
+		/*Upload.prototype.rastrear = function(){
+		   
+		    var f = $('#progress_iframe');
+			setInterval(function(){f.attr("src", "c_upload/Progreso");}, 1000);
+			 	
+		}*/
+		
+		Upload.prototype.pedirImagenes = function(){
+		    $.consultaAjax.ejecutar({
+									url: this.urls.listar,
+									persistir: this,
+									accionCorrecta: this.mostrarImagenes						
+									});			    
+//			ConsultaAjax(this.urls.listar, undefined, this.mostrarImagenes, undefined, this);
+		}
+		Upload.prototype.mostrarImagenes = function(data, obj){
+		    obj.esperador.remove();
+		    if(data.imagenes != null){				
+				for(var i = 0; i < data.imagenes.length; i++){
+						obj.crearImagen(data.imagenes[i], obj);						
+				}
+				obj.redefinirAltura(false, obj);
+//				obj.mostrarScroll();
+			}
+			else{
+				obj.mostrarMensajeVacio();
+			}			
+		}
+		
+		Upload.prototype.mostrarScroll = function(){
+		    if(this.scroll != undefined){
+				this.scroll.mostrarScroll();
+			}				
+			else{
+			$.JCP.upload.objTemp = this;
+				$.JCP.Crear('scroll', {
+                                          elemento: this.contenedorImagenes,
+										  salto:15
+   										}, this.guardarObjScroll);
+			}	
+			
+		}
+		
+		Upload.prototype.guardarObjScroll = function(scroll){
+			$.JCP.upload.objTemp.scroll = scroll;
+			$.JCP.upload.objTemp = null;
+		}
+		
+		Upload.prototype.crearImagen = function(imagen, obj, efecto){		   
+					 var contenedorImag = $('<div class="contImgUpload"></div>').prependTo(obj.contImagenesFinal);
+					 if(efecto){
+						/*var alto = contenedorImag.height();
+						var ancho = contenedorImag.width();*/
+						contenedorImag.css({
+							height:0,
+							width:0
+						});
+				    }
+					/*else
+						contenedorImag.css({
+							height:this.altoImag,
+							width:this.anchoImag
+						});*/
+					 	 contenedorImag.attr("id", imagen.id_imagen);
+			   	    if(obj.vacio != undefined){//guando no hay imagenes
+						obj.vacio.remove();
+						obj.vacio = undefined;
+					}
+					/*contenedorImag.css({
+					 	position:'relative',
+						float:'left',
+						width:120,
+						height:145,
+						border:'1px solid brown',
+						padding:5,
+						margin:5,
+						backgroundColor:'#8dcb87'
+					});*/
+					var imagenDiv = $('<img src="http://10.0.0.2:5900/cantante/application/imagenes/upload/'+imagen.src+'">').appendTo(contenedorImag);
+						imagenDiv.css({
+							width:120,
+							height:120,
+							margin:5
+						});
+										
+					var titulo = $('<div class="tituloImgUpload"></div>').appendTo(contenedorImag);
+					if(imagen.titulo != null)
+					    titulo.text(imagen.titulo);
+						/*titulo.css({
+							width:'100%',
+							height:25,
+							textAlign:'center'
+						});*/
+								
+				    var eliminar = $('<div class="eliminarImgUpload"></div>').prependTo(contenedorImag);
+						eliminar.css({
+							position:'absolute',
+							zIndex:'2',							
+							left:imagenDiv.width()-25,
+							top:10,
+							height:25,
+							width:25,							
+							cursor:'pointer'
+						});
+						var obj = this;
+						eliminar.click(function(){
+//							var data = {id : contenedorImag.attr("id")};
+							$.consultaAjax.ejecutar({
+									url: obj.urls.eliminar,
+									persistir: obj,
+									accionCorrecta: obj.FotoEliminada,
+									accionError: obj.FotoNoEliminada,
+									data:{
+										id : contenedorImag.attr("id")
+									}									
+							});
+//							ConsultaAjax(obj.urls.eliminar, data, obj.FotoEliminada, obj.FotoNoEliminada, obj);
+						});	
+//						contenedorImag.css({height:imagenDiv.height()+titulo.height(), width:imagenDiv.width()});     
+				 if(efecto){				 
+				 	contenedorImag.animate({height:obj.altoImag, width:obj.anchoImag});	
+				    obj.redefinirAltura(true, obj);					
+				 }				 	   
+//				 obj.redefinirAltura(165, 120);				
+		}
+		
+		Upload.prototype.redefinirAltura = function(nueva, obj){
+		    
+			/*if(obj.contImagenesFinal.children('.contImgUpload').length == 1)	
+				obj.contImagenesFinal.height(168);
+			else if(obj.contImagenesFinal.children('.contImgUpload').length > 1){
+			     var imagen = obj.contImagenesFinal.children(':last');
+				if(nueva){
+				    if(obj.cantidadXFila == undefined){
+//					    alert(obj.contImagenesFinal.width());
+//						var primero = obj.contImagenesFinal.children(':first').next();
+//						alert(primero.width());
+
+						var cantidad = 	obj.contImagenesFinal.width()/(obj.anchoImg);
+						//alert(cantidad);
+						obj.cantidadXFila = parseInt(cantidad);
+//							alert(obj.cantidadXFila);
+					}
+					
+//					alert(obj.contImagenesFinal.children().length);
+//					alert(obj.cantidadXFila);
+//alert((obj.contImagenesFinal.children().length-1)%obj.cantidadXFila);
+					if((obj.contImagenesFinal.children().length-1)%obj.cantidadXFila == 0){
+//					alert('b');
+						obj.contImagenesFinal.height(obj.contImagenesFinal.height() + 168);				
+						}
+				}					
+				else
+					obj.contImagenesFinal.height(imagen.offset().top + imagen.height() - obj.contImagenesFinal.parent().offset().top + 20);
+			}
+			else	
+				obj.contImagenesFinal.height(0);*/
+		}
+		
+		Upload.prototype.mostrarMensajeVacio = function(){
+			this.vacio = $('<div class="vacio">'+this.mensajeVacio+'</div>').appendTo(this.contImagenesFinal);		
+					this.vacio.css({
+						height:25,
+						width:'50%',
+						border:'1px solid red',
+						padding:5
+					});
+//					$.centrar(this.vacio, true, false);
+					this.vacio.centrar(true, false);
+					
+		}		
+		Upload.prototype.FotoEliminada = function(data, obj){
+			var imagen = $('#'+data);
+				imagen.animate({height:0, width:0}, function(){
+					$(this).remove();
+					if(obj.contenedorImagenes.find('.contImgUpload').length == 0)
+						obj.mostrarMensajeVacio();								
+      			});								
+		}
+		Upload.prototype.FotoNoEliminada = function(data){
+			
+		}
+		Upload.prototype.Esperar = function(){ 
+			this.contImagenesFinal.children().remove();
+			this.esperador = $('<div></div>').appendTo(this.contImagenesFinal);
+			this.esperador.css({
+				    zIndex: '2',
+				 	height : '100%',
+					width : '100%'
+				 });
+				 var img = $('<img src="/cantante/application/libraries/Propias/imagenes/cargandoUpload.gif">').appendTo(this.esperador);
+				 img.css({height:'30%', width:'30%'});
+//				 	 $.centrar(img, true, true, this.contenedorImagenes);
+				 	 img.centrar(true, true, this.contenedorImagenes);
+					 	
+		}
+		this.construirUpload();
+	},
+	retorno: function(retorno){
+	    var obj = $.JCP.upload.objTemp;
+//		alert(obj.cantidadXFila);
+		if(retorno.error != undefined){
+			switch(retorno.error){
+				case 1:
+				alert('No se ha podido realizar la operaci&oacute;n');break;
+				case 2:
+				alert('El archivo selecciona no tiene un formato v&aacute;lido para '+retorno.tipo);break;
+				case 3:
+				alert('El tama&ntilde;o m&aacute;ximo no puede exceder de '+retorno.tamano);break;
+				case 4:
+				alert('No se ha podido subir el archivo. Posible error de permisos');break
+			}
+		}
+		else{
+//		alert(obj.altoImag);
+			obj.crearImagen(retorno, obj, true);
+			
+//            	obj.mostrarScroll();
+		
+		}
+	},
+	opcionesDefecto :{
+	 	anchoImag: 130,
+		altoImag:155,
+		titulo : "Cargar Imagenes",
+		mensajeVacio: 'No hay imagenes para mostrar',
+	}
+	
+}

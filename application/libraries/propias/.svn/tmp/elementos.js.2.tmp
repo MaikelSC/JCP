@@ -1,0 +1,169 @@
+$.Elementos = {
+    data : null ,
+//-------------------------------crearTablaFormulario--------------------------------------------------------
+//Descripcion: dada una tabla padre crea y organiza en columnas un arreglo de tablas hijo.
+//Parametros: tabla padre, arreglo de tablas hijo a crear y cantidad de columnas que tendran.
+//Retorno: cada tabla hijo creada.
+	crearTablaFormulario:function(tablapadre, hijo, columnas){
+        var tablahijo = $('<table id="tb_'+hijo.id+'"/>');
+		if(hijo.fieldset)
+			var hijoformulario = $.Elementos.crearFieldSet(hijo.id, tablahijo, hijo.titulo, hijo.align);
+		else
+			var hijoformulario = tablahijo;	
+		if(tablapadre.children().find('>tr').length != 0 && tablapadre.children().find('>tr:last').children('td').length < columnas){
+			var col = $('<td></td>').appendTo(tablapadre.children().find('>tr:last'));
+		    hijoformulario.appendTo(col);
+		}
+		else{
+			var fila = $('<tr></tr>').appendTo(tablapadre);
+			var col = $('<td></td>').appendTo(fila);
+		    hijoformulario.appendTo(col);
+		}
+		 return tablahijo;
+	},
+//------------------------------------------------------------------------------------------------------------
+																									          //-------------------------------------crearFila--------------------------------------------------------------
+//Descripcion: 
+//Parametros: 
+//Retorno:																									  
+    crearFila : function(formulario, pos, columnas , tipos, names, ids){
+           if(formulario.find('tr').length > 0){
+		   	var fila = $('<tr></tr>').insertAfter(formulario.find('tr:eq('+pos+')'));
+		   }	      	 
+		   else{
+		   		var fila = $('<tr></tr>').appendTo(formulario);
+		   }
+		   for(var i =0; i< columnas; i++){	
+		   		var label = $('<td></td>').appendTo(fila);
+				var padreElemento = $('<td></td>').appendTo(fila);
+				if(names[i] != undefined){
+				   label.text(names[i]);
+				   var elemento = this.crearElemento(tipos[i], ids[i], names[i], padreElemento);
+				   if(elemento != undefined)
+				   elemento.appendTo(padreElemento);	
+				}				
+		   }			   
+	},
+//------------------------------------------------------------------------------------------------------------
+
+//-------------------------------------crearElemento----------------------------------------------------------
+//Descripcion: 
+//Parametros: 
+//Retorno:	
+    crearElemento : function(tipo, id, name, padreElemento){
+		if(tipo<2)
+			var elemento = this.crearText(tipo, id, name);
+		else if(tipo < 3)
+		    var elemento = this.crearSelect(tipo, id, name);
+		else if(tipo < 4)
+		    var elemento = this.crearBoton(tipo, id, name);
+		else if(tipo == 10)	{
+		    var elemento = $.JCP.Crear('cleditor',{
+			                              padre:padreElemento,
+										  tieneCss: true,
+	                                      jquery:true,
+										  id:id,
+										  name:name,
+		                                  width:300
+	                                      }
+	       );	
+		}   		
+		return elemento;	
+	},
+//------------------------------------------------------------------------------------------------------------
+
+//-------------------------------------crearText--------------------------------------------------------------
+//Descripcion: 
+//Parametros: 
+//Retorno:
+	crearText : function(tipo, id, name){
+		switch(tipo){
+			case 1: var textbox = $('<input id="'+id+'" name="'+name+'" type="text" class = "campos_texto"/>');
+			break;
+			case 1.1: var textbox = $('<input id="'+id+'" name="'+name+'" class = "campos_texto"/>');
+			break;
+			case 1.3:var textbox = $('<input id="'+id+'" name="'+name+'" type="text" class = "campos_texto"/>');
+			          textbox.datepicker({
+//							showOn: "button",
+//							buttonImage:  'application/libraries/propias/imagenes/calendario.gif',
+//							buttonImageOnly: true,
+							dateFormat: 'dd/m/yy',
+							/*onSelect: function() {
+							if(metodoSelect != undefined)
+							   metodoSelect(textbox);}*/
+					 }); 
+		}
+		if(this.data != undefined)
+			textbox.val(this.data[id]);
+		return textbox;
+	},
+//------------------------------------------------------------------------------------------------------------
+
+//-------------------------------------crearSelect------------------------------------------------------------
+//Descripcion: Dado un nombre y un id se crea un combobox y se carga con los valores que se le entren por data
+//Parametros: el id del combo, el name y el tipo que no se utiliza en este caso
+//Retorno: se devuelve el propio combobox
+	crearSelect : function(tipo, id, name){
+	    var select = $('<select id="'+id+'" name="'+name+'" class = "campos_texto"/>');
+		             $('<option value="-1">Seleccione</option>').appendTo(select);
+		if(this.data != undefined){
+		    $('<option value="'+this.data[id].id+'">'+this.data[id].valor+'</option>').appendTo(select);
+		}			 
+		return select;
+	},
+//-----------------------------------------------------------------------------------------------------------
+
+//-------------------------------------crearBoton------------------------------------------------------------
+//Descripcion: Dado un nombre y un id se crea un boton
+//Parametros: el id y el name del boton que en este caso seria el value que se muestra
+//Retorno: se devuelve el propio boton;
+	crearBoton : function(id, name){
+		var boton = $('<input type="button" class="boton" id="'+id+'" value="'+name+'" />');
+		return boton;
+	},
+//------------------------------------------------------------------------------------------------------------
+
+//-------------------------------------crearFieldSet----------------------------------------------------------
+//Descripcion: se crea un fieldset para agrupar varios elementos que vendrian en un contenedor e este caso
+//Parametros: el id del fielset, el hijo que seria el contenedor con los elementos, el titulo o leyenda 
+//y su alineacion a la izq, al centro o la dercha
+//Retorno: devuelve el propio fieldset
+	crearFieldSet : function(id, hijo, titulo, alinTitulo){
+		var field = $('<fieldset id = "fs_'+id+'"></fieldset>');
+		if(titulo != undefined)
+		var titulo = $('<legend id = "fs_'+id+'_titulo" align = "'+alinTitulo+'">'+titulo+'</legend>').appendTo(field);
+		hijo.appendTo(field);
+        return field;
+	}
+//------------------------------------------------------------------------------------------------------------
+}
+//metodo para centrar un elemento
+//elemento: elemento para centrar
+//x, y: valores booleanos para centrar o no en cada eje, si es undefined toma valor true
+//referencia: elemento con respecto al que se va a centrar, sino se pasa se centra con respecto al padre
+$.centrar = function(elemento, x, y, referencia){
+    if(x == undefined || x == true)
+		x = true;
+	if(y == undefined || y == true)
+		y = true;
+	var padre = elemento.parent();	
+	if(referencia == undefined){
+		var referenciaX = 0;
+		var referenciaY = 0;
+	}	
+	else{		
+		var referenciaX = padre.offset().left - referencia.offset().left;
+		var referenciaY = padre.offset().top - referencia.offset().top;
+	} 	
+	elemento.css({
+		position:'relative',		
+	});
+	if(x == true)
+	elemento.css({
+		left:padre.width()/2-elemento.width()/2	- referenciaX	
+	});
+	if(y)
+	elemento.css({
+		top:padre.height()/2-elemento.height()/2 - referenciaY			
+	});		
+}
